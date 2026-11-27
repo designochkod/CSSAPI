@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f2f2f0">
+  <title>CSS Kunskap</title>
+  <style>
+    :root {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #20211f;
+      background: #f2f2f0;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --ink: #20211f;
+      --muted: #666862;
+      --line: #deded9;
+      --surface: #fff;
+      --soft: #f7f7f5;
+      --focus: #1769aa;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      background: #f2f2f0;
+      color: var(--ink);
+    }
+
+    button, input { font: inherit; }
+
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: absolute;
+      z-index: 20;
+      top: 8px;
+      left: 8px;
+      padding: 12px 16px;
+      transform: translateY(-160%);
+      border-radius: 8px;
+      background: #fff;
+      color: #111;
+
+      &:focus { transform: translateY(0); }
+    }
+
+    .topbar {
+      position: sticky;
+      z-index: 5;
+      top: 0;
+      display: flex;
+      min-height: 68px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px clamp(18px, 5vw, 64px);
+      border-bottom: 1px solid var(--line);
+      background: rgb(242 242 240 / 94%);
+      backdrop-filter: blur(12px);
+
+      & .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        color: var(--ink);
+        font-weight: 750;
+        letter-spacing: -.035em;
+        text-decoration: none;
+      }
+
+      & .brand-icon {
+        display: grid;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        border-radius: 11px;
+        background: #292a27;
+        color: white;
+      }
+
+      & nav {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      & nav a {
+        padding: 10px 12px;
+        border-radius: 9px;
+        color: #41423e;
+        font-size: .9rem;
+        text-decoration: none;
+
+        &:hover { background: #e6e6e2; }
+      }
+    }
+
+    .menu-button {
+      display: none;
+      min-width: 44px;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    #mobile-menu {
+      position: fixed;
+      inset: 76px 14px auto auto;
+      width: min(270px, calc(100vw - 28px));
+      margin: 0;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--surface);
+      box-shadow: 0 18px 50px rgb(0 0 0 / 14%);
+
+      &::backdrop { background: rgb(20 20 20 / 24%); }
+
+      & nav {
+        display: grid;
+        gap: 5px;
+      }
+
+      & a {
+        padding: 12px;
+        border-radius: 9px;
+        color: var(--ink);
+        text-decoration: none;
+
+        &:hover { background: var(--soft); }
+      }
+    }
+
+    main {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 48px 0 72px;
+    }
+
+    .hero {
+      max-width: 760px;
+      margin: 0 auto 36px;
+      text-align: center;
+
+      & .eyebrow {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: .76rem;
+        font-weight: 750;
+        letter-spacing: .13em;
+        text-transform: uppercase;
+      }
+
+      & h1 {
+        margin: 0;
+        font-size: clamp(2.1rem, 6vw, 4rem);
+        letter-spacing: -.065em;
+        line-height: 1.02;
+      }
+
+      & p:last-child {
+        max-width: 660px;
+        margin: 16px auto 0;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .search-wrap {
+      flex: 1 1 260px;
+      max-width: 440px;
+
+      & input {
+        width: 100%;
+        min-height: 46px;
+        padding: 10px 14px;
+        border: 1px solid #c9cac4;
+        border-radius: 11px;
+        background: var(--surface);
+        color: var(--ink);
+      }
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .filter-button {
+      min-height: 40px;
+      padding: 8px 12px;
+      border: 1px solid #d0d1cb;
+      border-radius: 999px;
+      background: var(--surface);
+      color: #41423e;
+      cursor: pointer;
+
+      &[aria-pressed="true"] {
+        border-color: #292a27;
+        background: #292a27;
+        color: #fff;
+      }
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(300px, .8fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .catalog {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .css-card, .demo-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 4px 16px rgb(35 35 30 / 3%);
+    }
+
+    .css-card {
+      padding: 19px;
+
+      & .card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      & h2 {
+        margin: 0;
+        font-size: 1.02rem;
+        letter-spacing: -.025em;
+      }
+
+      & p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: .89rem;
+        line-height: 1.55;
+      }
+
+      & .category {
+        flex: 0 0 auto;
+        padding: 5px 8px;
+        border-radius: 999px;
+        background: #efefec;
+        color: #555750;
+        font-size: .7rem;
+        font-weight: 700;
+      }
+
+      & code {
+        color: #3f4943;
+        font-size: .82rem;
+        overflow-wrap: anywhere;
+      }
+    }
+
+    .demo-panel {
+      position: sticky;
+      top: 88px;
+      padding: 22px;
+
+      & > h2 {
+        margin: 0;
+        font-size: 1.1rem;
+        letter-spacing: -.025em;
+      }
+
+      & > p {
+        margin: 8px 0 18px;
+        color: var(--muted);
+        font-size: .89rem;
+        line-height: 1.55;
+      }
+    }
+
+    .demo-section {
+      padding: 16px 0;
+      border-top: 1px solid var(--line);
+
+      & h3 {
+        margin: 0 0 10px;
+        font-size: .94rem;
+      }
+
+      & p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: .83rem;
+        line-height: 1.5;
+      }
+
+      & label {
+        display: block;
+        margin: 10px 0 6px;
+        color: #41423e;
+        font-size: .84rem;
+        font-weight: 650;
+      }
+    }
+
+    .button, .button-secondary {
+      display: inline-flex;
+      min-height: 42px;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 13px;
+      border: 1px solid #292a27;
+      border-radius: 10px;
+      background: #292a27;
+      color: white;
+      font-weight: 650;
+      cursor: pointer;
+
+      &:hover { background: #454641; }
+    }
+
+    .button-secondary {
+      border-color: #c9cac4;
+      background: white;
+      color: var(--ink);
+
+      &:hover { background: #f0f0ed; }
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .demo-output {
+      min-height: 22px;
+      color: #4d4f49;
+      font-size: .85rem;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .demo-input {
+      width: 100%;
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid #c9cac4;
+      border-radius: 9px;
+      background: white;
+      color: var(--ink);
+    }
+
+    .container-demo {
+      container-type: inline-size;
+      resize: horizontal;
+      min-width: 180px;
+      max-width: 100%;
+      overflow: auto;
+      padding: 10px;
+      border: 1px dashed #a5a69f;
+      border-radius: 11px;
+      background: #f6f6f3;
+
+      & .container-card {
+        display: grid;
+        gap: 9px;
+        padding: 14px;
+        border-radius: 9px;
+        background: #e7e7e2;
+      }
+
+      & .container-card span {
+        color: #5d5e58;
+        font-size: .84rem;
+      }
+    }
+
+    @container (width > 330px) {
+      .container-demo .container-card {
+        grid-template-columns: auto 1fr;
+        align-items: center;
+      }
+    }
+
+    .has-demo {
+      padding: 13px;
+      border: 1px solid #d4d4ce;
+      border-radius: 10px;
+      background: #f7f7f5;
+
+      &:has(input:checked) {
+        border-color: #6b6d65;
+        background: #e9e9e5;
+      }
+
+      & label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+      }
+    }
+
+    .color-demo {
+      min-height: 74px;
+      padding: 15px;
+      border-radius: 10px;
+      background: color-mix(in srgb, #777 24%, white);
+      transition: background-color .25s ease;
+
+      &[data-tone="dark"] {
+        background: color-mix(in srgb, #333 82%, white);
+        color: white;
+      }
+    }
+
+    .scroll-demo {
+      max-height: 210px;
+      overflow: auto;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fafaf8;
+
+      & .scroll-bar {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        height: 8px;
+        transform-origin: left;
+        background: #4c4e48;
+        animation: reading-progress linear;
+        animation-timeline: scroll(root);
+      }
+
+      & p {
+        color: #555750;
+        font-size: .88rem;
+        line-height: 1.65;
+      }
+    }
+
+    @keyframes reading-progress {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-bar { animation: none !important; }
+      *, *::before, *::after { scroll-behavior: auto !important; }
+    }
+
+    .no-results {
+      grid-column: 1 / -1;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--muted);
+    }
+
+    .notice {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #ededeb;
+      color: #4c4e48;
+      font-size: .86rem;
+      line-height: 1.55;
+    }
+
+    footer {
+      padding: 24px 18px 36px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      text-align: center;
+      font-size: .84rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .demo-panel { position: static; }
+    }
+
+    @media (max-width: 700px) {
+      .topbar nav.desktop-nav { display: none; }
+      .menu-button { display: inline-grid; place-items: center; }
+      main { padding-top: 36px; }
+      .catalog { grid-template-columns: 1fr; }
+      .toolbar { align-items: stretch; }
+      .search-wrap { max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Hoppa till innehåll</a>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="CSS Atlas, startsida">
+      <span class="brand-icon" aria-hidden="true">C</span>
+      <span>CSS Kunskap</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Huvudnavigation">
+      <a href="#catalog">CSS-katalog</a>
+      <a href="#demos">Prova CSS</a>
+    </nav>
+
+    <button class="menu-button" id="menu-toggle" type="button" popovertarget="mobile-menu" aria-controls="mobile-menu" aria-expanded="false" aria-label="Öppna meny">☰</button>
+
+    <div id="mobile-menu" popover>
+      <nav aria-label="Mobilnavigation">
+        <a href="#catalog">CSS-katalog</a>
+        <a href="#demos">Prova CSS</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="title">
+      <p class="eyebrow">En guide till CSS</p>
+      <h1>Styla smartare.<br>Bygg med CSS.</h1>
+      <p>Utforska moderna CSS-funktioner för layout, färg, responsiv design och rörelse. Läs korta förklaringar och prova exempel direkt på sidan.</p>
+    </section>
+
+    <section id="catalog" aria-label="CSS-katalog">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <label class="skip-link" for="search">Sök bland CSS-funktioner</label>
+          <input id="search" type="search" placeholder="Sök CSS-funktion eller användningsområde" autocomplete="off">
+        </div>
+        <div class="filters" role="group" aria-label="Filtrera CSS-katalog">
+          <button class="filter-button" type="button" data-filter="Alla" aria-pressed="true">Alla</button>
+          <button class="filter-button" type="button" data-filter="Layout" aria-pressed="false">Layout</button>
+          <button class="filter-button" type="button" data-filter="Selektorer" aria-pressed="false">Selektorer</button>
+          <button class="filter-button" type="button" data-filter="Färg" aria-pressed="false">Färg</button>
+          <button class="filter-button" type="button" data-filter="Rörelse" aria-pressed="false">Rörelse</button>
+          <button class="filter-button" type="button" data-filter="Syntax" aria-pressed="false">Syntax</button>
+        </div>
+      </div>
+
+      <p id="catalog-count" class="demo-output" aria-live="polite"></p>
+
+      <div class="layout">
+        <div class="catalog" id="catalog-grid"></div>
+
+        <aside class="demo-panel" id="demos" aria-labelledby="demo-title">
+          <h2 id="demo-title">Prova CSS-funktioner</h2>
+          <p>Exemplen använder CSS direkt. Du behöver inte ge webbplatsen särskilda behörigheter.</p>
+
+          <section class="demo-section" aria-labelledby="container-title">
+            <h3 id="container-title">Container queries</h3>
+            <p>Dra i rutans nedre högra hörn för att ändra bredd. Innehållet anpassar sig efter behållaren.</p>
+            <div class="container-demo">
+              <div class="container-card">
+                <strong>Responsiv komponent</strong>
+                <span>Layouten reagerar på utrymmet här, inte på hela fönstrets bredd.</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="demo-section" aria-labelledby="has-title">
+            <h3 id="has-title">:has()-selektorn</h3>
+            <div class="has-demo">
+              <label>
+                <input id="has-checkbox" type="checkbox">
+                <span>Markera för att ändra stilen på föräldern</span>
+              </label>
+            </div>
+            <p>Förälderelementet ändrar utseende när det innehåller en markerad ruta.</p>
+          </section>
+
+          <section class="demo-section" aria-labelledby="color-title">
+            <h3 id="color-title">color-mix()</h3>
+            <div class="color-demo" id="color-demo">Bakgrundsfärgen blandas i CSS.</div>
+            <div class="button-row">
+              <button class="button" id="tone-button" type="button" aria-pressed="false">Växla färgton</button>
+            </div>
+            <p>CSS blandar färger utan att du behöver räkna fram en ny färg manuellt.</p>
+          </section>
+
+          <section class="demo-section" aria-labelledby="scroll-title">
+            <h3 id="scroll-title">Scroll-driven animation</h3>
+            <p>Rulla innehållet i rutan för att se progressindikatorn följa rullningen.</p>
+            <div class="scroll-demo" id="scroll-demo">
+              <div class="scroll-bar" aria-hidden="true"></div>
+              <p>CSS kan koppla en animation till en scroll-tidslinje. Det här exemplet visar en dekorativ läsprogression.</p>
+              <p>Funktionen stöds inte i alla webbläsare. Om animationen saknas är texten fortfarande tillgänglig och läsbar.</p>
+              <p>Scrolla lite till. Innehåll och funktion ska inte vara beroende av animationen.</p>
+              <p>En progressiv förbättring innebär att grundinnehållet fungerar även när en nyare CSS-funktion saknas.</p>
+            </div>
+          </section>
+
+          <section class="demo-section" aria-labelledby="clamp-title">
+            <h3 id="clamp-title">clamp() och responsiv typografi</h3>
+            <label for="size-range">Rubrikstorlek: <output id="size-output">32 px</output></label>
+            <input class="demo-input" id="size-range" type="range" min="20" max="56" value="32">
+            <p id="clamp-heading" style="margin: 12px 0 0; font-size: clamp(1.25rem, 4vw, 3rem); font-weight: 750; letter-spacing: -.04em; color: #343631;">CSS anpassar sig</p>
+            <p><code>clamp(min, flexibel storlek, max)</code> begränsar hur mycket ett värde får växa.</p>
+          </section>
+        </aside>
+      </div>
+
+      <p class="notice">CSS-stöd varierar mellan webbläsare och versioner. Använd grundläggande layout som reserv, kontrollera nyare funktioner med <code>@supports</code> och respektera inställningen för minskad rörelse.</p>
+    </section>
+  </main>
+
+  <footer>
+    CSS Atlas är en fristående demonstrationssida. Interaktionerna ändrar bara utseendet på den här sidan.
+  </footer>
+
+  <script>
+    const features = [
+      {
+        name: "Container queries",
+        category: "Layout",
+        description: "Styla en komponent efter storleken på dess behållare i stället för hela webbläsarfönstret.",
+        example: "container-type: inline-size; @container (width > 30rem) { … }"
+      },
+      {
+        name: "CSS Grid",
+        category: "Layout",
+        description: "Skapa tvådimensionella layouter med rader och kolumner, även med flexibla storlekar.",
+        example: "display: grid; grid-template-columns: repeat(3, 1fr)"
+      },
+      {
+        name: "Subgrid",
+        category: "Layout",
+        description: "Låt ett nästlat rutnät använda spårdefinitionerna från sitt överordnade grid.",
+        example: "grid-template-columns: subgrid"
+      },
+      {
+        name: "Flexbox",
+        category: "Layout",
+        description: "Ordna objekt längs en axel och fördela utrymme mellan dem.",
+        example: "display: flex; align-items: center; gap: 1rem"
+      },
+      {
+        name: "Anchor positioning",
+        category: "Layout",
+        description: "Positionera ett element i förhållande till ett annat ankare med CSS.",
+        example: "anchor-name: --target; position-anchor: --target"
+      },
+      {
+        name: "Logical properties",
+        category: "Layout",
+        description: "Använd riktningsoavhängiga egenskaper som fungerar med olika skriv- och läsriktningar.",
+        example: "margin-inline: auto; padding-block: 1rem"
+      },
+      {
+        name: "clamp(), min() och max()",
+        category: "Layout",
+        description: "Skapa värden som anpassar sig mellan gränser, till exempel responsiv textstorlek.",
+        example: "font-size: clamp(1rem, 4vw, 2.5rem)"
+      },
+      {
+        name: "Aspect ratio",
+        category: "Layout",
+        description: "Håll ett elements proportioner utan att räkna ut både bredd och höjd.",
+        example: "aspect-ratio: 16 / 9"
+      },
+      {
+        name: ":has()",
+        category: "Selektorer",
+        description: "Välj ett element utifrån vilka element det innehåller eller följs av.",
+        example: ".card:has(img) { … }"
+      },
+      {
+        name: ":focus-visible",
+        category: "Selektorer",
+        description: "Visa tydlig fokusmarkering när användaren navigerar med tangentbord eller liknande.",
+        example: ":focus-visible { outline: 3px solid blue }"
+      },
+      {
+        name: ":is() och :where()",
+        category: "Selektorer",
+        description: "Gruppera selektorer. :where() ger ingen extra specificitet.",
+        example: ":is(h1, h2, h3) { line-height: 1.1 }"
+      },
+      {
+        name: "Nesting",
+        category: "Syntax",
+        description: "Skriv relaterade regler inuti varandra i vanlig CSS med nästlade selektorer.",
+        example: ".card { & h2 { margin: 0; } }"
+      },
+      {
+        name: "Cascade layers",
+        category: "Syntax",
+        description: "Styr kaskadens prioritetsordning med namngivna lager.",
+        example: "@layer reset, base, components, utilities;"
+      },
+      {
+        name: "@supports",
+        category: "Syntax",
+        description: "Applicera förbättrade stilar bara när webbläsaren stöder den angivna funktionen.",
+        example: "@supports (display: grid) { … }"
+      },
+      {
+        name: "Custom properties",
+        category: "Syntax",
+        description: "Definiera återanvändbara CSS-värden som kan läsas med var().",
+        example: "--surface: #fff; background: var(--surface)"
+      },
+      {
+        name: "color-mix()",
+        category: "Färg",
+        description: "Blanda färger i CSS med valbart färgrum och blandningsproportioner.",
+        example: "color-mix(in srgb, tomato 30%, white)"
+      },
+      {
+        name: "Relative colors",
+        category: "Färg",
+        description: "Utgå från en befintlig färg och justera dess färgkomponenter i CSS.",
+        example: "oklch(from var(--brand) l c h)"
+      },
+      {
+        name: "color-scheme",
+        category: "Färg",
+        description: "Ange om sidan stöder ljust eller mörkt färgschema för inbyggda kontroller.",
+        example: "color-scheme: light dark"
+      },
+      {
+        name: "Scroll-driven animations",
+        category: "Rörelse",
+        description: "Koppla animationens förlopp till hur långt användaren rullar.",
+        example: "animation-timeline: scroll(root)"
+      },
+      {
+        name: "View Transitions",
+        category: "Rörelse",
+        description: "Skapa en övergång mellan två visuella tillstånd med CSS och en webbläsarövergång.",
+        example: "::view-transition-old(root) { … }"
+      },
+      {
+        name: "@starting-style",
+        category: "Rörelse",
+        description: "Definiera startstilar för element som läggs till i dokumentet och sedan övergår.",
+        example: "@starting-style { .panel { opacity: 0; } }"
+      },
+      {
+        name: "prefers-reduced-motion",
+        category: "Rörelse",
+        description: "Anpassa eller ta bort rörelse när användaren har bett operativsystemet om mindre animation.",
+        example: "@media (prefers-reduced-motion: reduce) { … }"
+      },
+      {
+        name: "Scroll snap",
+        category: "Rörelse",
+        description: "Styr var innehåll landar när användaren rullar i en behållare.",
+        example: "scroll-snap-type: x mandatory"
+      },
+      {
+        name: "CSS masks",
+        category: "Färg",
+        description: "Använd en mask för att styra vilka delar av ett element som syns.",
+        example: "mask-image: linear-gradient(black, transparent)"
+      }
+    ];
+
+    const grid = document.querySelector("#catalog-grid");
+    const search = document.querySelector("#search");
+    const count = document.querySelector("#catalog-count");
+    const filterButtons = [...document.querySelectorAll(".filter-button")];
+    let activeCategory = "Alla";
+
+    function renderCatalog() {
+      const query = search.value.trim().toLocaleLowerCase("sv");
+      const results = features.filter((feature) => {
+        const categoryMatch = activeCategory === "Alla" || feature.category === activeCategory;
+        const searchable = `${feature.name} ${feature.category} ${feature.description} ${feature.example}`.toLocaleLowerCase("sv");
+        return categoryMatch && searchable.includes(query);
+      });
+
+      grid.replaceChildren();
+      count.textContent = `${results.length} CSS-funktioner visas.`;
+
+      if (!results.length) {
+        const empty = document.createElement("p");
+        empty.className = "no-results";
+        empty.textContent = "Inga funktioner matchar sökningen. Prova ett annat ord eller filter.";
+        grid.append(empty);
+        return;
+      }
+
+      for (const feature of results) {
+        const card = document.createElement("article");
+        card.className = "css-card";
+
+        const top = document.createElement("div");
+        top.className = "card-top";
+
+        const heading = document.createElement("h2");
+        heading.textContent = feature.name;
+
+        const badge = document.createElement("span");
+        badge.className = "category";
+        badge.textContent = feature.category;
+
+        const description = document.createElement("p");
+        description.textContent = feature.description;
+
+        const example = document.createElement("p");
+        const code = document.createElement("code");
+        code.textContent = feature.example;
+        example.append(code);
+
+        top.append(heading, badge);
+        card.append(top, description, example);
+        grid.append(card);
+      }
+    }
+
+    search.addEventListener("input", renderCatalog);
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        activeCategory = button.dataset.filter;
+        filterButtons.forEach((item) => {
+          item.setAttribute("aria-pressed", String(item === button));
+        });
+        renderCatalog();
+      });
+    });
+
+    const menu = document.querySelector("#mobile-menu");
+    const menuToggle = document.querySelector("#menu-toggle");
+
+    menu.addEventListener("toggle", (event) => {
+      const open = event.newState === "open";
+      menuToggle.setAttribute("aria-expanded", String(open));
+      menuToggle.setAttribute("aria-label", open ? "Stäng meny" : "Öppna meny");
+    });
+
+    menu.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => menu.hidePopover());
+    });
+
+    const colorDemo = document.querySelector("#color-demo");
+    const toneButton = document.querySelector("#tone-button");
+
+    toneButton.addEventListener("click", () => {
+      const dark = toneButton.getAttribute("aria-pressed") !== "true";
+      toneButton.setAttribute("aria-pressed", String(dark));
+      colorDemo.dataset.tone = dark ? "dark" : "light";
+      colorDemo.textContent = dark ? "Mörk blandad färgton" : "Ljus blandad färgton";
+    });
+
+    const sizeRange = document.querySelector("#size-range");
+    const sizeOutput = document.querySelector("#size-output");
+    const clampHeading = document.querySelector("#clamp-heading");
+
+    sizeRange.addEventListener("input", () => {
+      const size = `${sizeRange.value}px`;
+      clampHeading.style.fontSize = size;
+      sizeOutput.value = size;
+      sizeOutput.textContent = size;
+    });
+
+    renderCatalog();
+  </script>
+</body>
+</html>
